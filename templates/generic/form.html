@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% comment %}
+Shared create/edit screen for the CRUD apps. The list screens stay bespoke
+because their columns differ, but every form is the same shape — one card,
+a field grid, save and cancel.
+
+Views set page_title and cancel_url; both have sensible fallbacks.
+{% endcomment %}
+
+{% block title %}{% if object %}Edit{% else %}New{% endif %} {{ page_title|default:"record" }}{% endblock %}
+{% block header %}{% if object %}Edit{% else %}New{% endif %} {{ page_title|default:"record" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+  <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5">
+    {% csrf_token %}
+
+    <div class="rounded-card border border-line bg-surface p-5">
+      {% include "ui/form.html" with form=form %}
+    </div>
+
+    <div class="flex gap-2">
+      <button type="submit"
+              class="rounded-card bg-brass px-4 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        {% if object %}Save changes{% else %}Create{% endif %}
+      </button>
+      <a href="{{ cancel_url|default:'..' }}"
+         class="rounded-card border border-line-2 px-4 py-2 text-sm text-ink-2 hover:bg-surface-2">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

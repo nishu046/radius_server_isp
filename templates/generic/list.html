@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% comment %}
+Shared list screen driven by a `columns` spec, for the plain CRUD models
+whose tables are genuinely uniform. Screens with real information design
+(subscribers, packages, dashboard) have their own templates instead.
+
+Views provide:
+  page_title   heading
+  columns      list of {label, value} dicts, prepared in get_context_data
+  create_url   optional
+{% endcomment %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block header %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold">{{ page_title }}</h1>
+      {% if page_description %}
+        <p class="mt-0.5 text-sm text-muted">{{ page_description }}</p>
+      {% endif %}
+    </div>
+    {% if create_url and can_add %}
+      <a href="{{ create_url }}"
+         class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        {{ create_label|default:"Add new" }}
+      </a>
+    {% endif %}
+  </div>
+
+  {% if filter %}
+    <form method="get" class="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface p-4">
+      {% for field in filter.form %}
+        {% include "ui/field.html" with field=field %}
+      {% endfor %}
+      <button type="submit"
+              class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">
+        Filter
+      </button>
+    </form>
+  {% endif %}
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            {% for heading in headings %}<th>{{ heading }}</th>{% endfor %}
+            <th class="text-right">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for row in rows %}
+            <tr class="hover:bg-surface-2">
+              {% for cell in row.cells %}
+                <td class="{% if cell.mono %}val {% endif %}text-ink-2">{{ cell.value|default:"—" }}</td>
+              {% endfor %}
+              <td class="text-right whitespace-nowrap">
+                {% if row.edit_url and can_change %}
+                  <a href="{{ row.edit_url }}" class="text-brass hover:underline">Edit</a>
+                {% endif %}
+                {% if row.delete_url and can_delete %}
+                  <a href="{{ row.delete_url }}"
+                     class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="{{ headings|length|add:1 }}" class="p-0">
+                {% include "ui/empty.html" with title=empty_title action_url=create_url action_label=create_label %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}{% include "ui/pagination.html" %}{% endif %}
+</div>
+{% endblock %}

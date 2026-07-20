@@ -36,7 +36,7 @@
       {% include "ui/nav_link.html" with url_name="dashboard:dashboard" label="Dashboard" %}
 
       <div class="mt-4 px-2 pb-1 font-mono text-[10px] uppercase tracking-wider text-muted">Service</div>
-      {% include "ui/nav_link.html" with url_name="client:clients" label="Subscribers" %}
+      {% include "ui/nav_link.html" with url_name="subscribers:list" label="Subscribers" perm="subscribers.view_subscriber" %}
       {% include "ui/nav_link.html" with url_name="billing:packages" label="Packages" perm="billing.view_package" %}
       {% include "ui/nav_link.html" with url_name="pop:pop" label="POPs" perm="pop.view_pop" %}
       {% include "ui/nav_link.html" with url_name="onu:onus" label="ONU devices" perm="onu.view_onu" %}
@@ -48,6 +48,8 @@
 
       {% if perms.accountants.view_invest %}
       <div class="mt-4 px-2 pb-1 font-mono text-[10px] uppercase tracking-wider text-muted">Accounts</div>
+      {% include "ui/nav_link.html" with url_name="dashboard:invests" label="Investment" %}
+      {% include "ui/nav_link.html" with url_name="dashboard:earns" label="Earnings" %}
       {% include "ui/nav_link.html" with url_name="dashboard:owners" label="Owners" %}
       {% endif %}
     </nav>

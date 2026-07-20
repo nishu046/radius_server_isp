@@ -31,8 +31,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
-    'crispy_bootstrap5',
     'django_filters',
     'django_celery_beat',
     # Custom applications
@@ -161,9 +159,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# crispy-forms — removed entirely in P3 when Tailwind form partials land
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 
 # Celery

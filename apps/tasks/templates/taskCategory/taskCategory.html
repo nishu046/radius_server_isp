@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Warehouse categories{% endblock %}
-{% block header %}Warehouse categories{% endblock %}
+{% block title %}Task categories{% endblock %}
+{% block header %}Task categories{% endblock %}
 
 {% block content %}
 <div class="flex flex-col gap-5">
 
   <div class="flex flex-wrap items-baseline justify-between gap-3">
     <div>
-      <h1 class="text-lg font-semibold">Warehouse categories</h1>
-      <p class="mt-0.5 text-sm text-muted">How stock is grouped.</p>
+      <h1 class="text-lg font-semibold">Task categories</h1>
+      <p class="mt-0.5 text-sm text-muted">How field jobs are grouped.</p>
     </div>
-    {% if perms.warehouse.add_warehousecategory %}
-      <a href="{% url 'warehouse:category-create' %}"
+    {% if perms.tasks.add_taskcategory %}
+      <a href="{% url 'tasks:create-category' %}"
          class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
         Add category
       </a>
@@ -34,17 +34,17 @@
           <tr class="hover:bg-surface-2">
             <td class="font-medium text-ink">{{ category.name }}</td>
             <td class="text-right whitespace-nowrap">
-              {% if perms.warehouse.change_warehousecategory %}
-                <a href="{% url 'warehouse:category-update' category.id %}" class="text-brass hover:underline">Edit</a>
+              {% if perms.tasks.change_taskcategory %}
+                <a href="{% url 'tasks:update-category' category.id %}" class="text-brass hover:underline">Edit</a>
               {% endif %}
-              {% if perms.warehouse.delete_warehousecategory %}
-                <a href="{% url 'warehouse:category-delete' category.id %}" class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+              {% if perms.tasks.delete_taskcategory %}
+                <a href="{% url 'tasks:delete-category' category.id %}" class="ml-3 text-muted hover:text-state-suspended">Delete</a>
               {% endif %}
             </td>
           </tr>
         {% empty %}
           <tr><td colspan="2" class="p-0">
-            {% include "ui/empty.html" with title="No categories" description="Categories group stock by equipment type." %}
+            {% include "ui/empty.html" with title="No categories" description="Categories group tasks by the kind of work involved." %}
           </td></tr>
         {% endfor %}
       </tbody>

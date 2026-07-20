@@ -16,4 +16,5 @@ urlpatterns = [
     path('dashboard/', include('apps.accountants.urls')),
     path('packages/', include('apps.packages.urls')),
     path('billing/', include('apps.billing.urls')),
+    path('subscribers/', include('apps.subscribers.urls')),
 ]+static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

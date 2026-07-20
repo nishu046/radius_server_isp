@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit {{ object.name }}{% else %}New subscriber{% endif %}{% endblock %}
+{% block header %}{% if object %}Edit subscriber{% else %}New subscriber{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+  <form method="post" class="flex flex-col gap-5"
+        x-data="{ conn: '{{ form.connection_type.value|default:'pppoe' }}' }">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="rounded-card border border-state-suspended bg-state-suspended-bg px-4 py-3">
+        {% for error in form.non_field_errors %}
+          <p class="text-sm text-state-suspended">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <section class="rounded-card border border-line bg-surface p-5">
+      <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Customer</h2>
+      <div class="mt-4 grid gap-5 sm:grid-cols-2">
+        {% include "ui/field.html" with field=form.account_no %}
+        {% include "ui/field.html" with field=form.name %}
+        {% include "ui/field.html" with field=form.phone %}
+        {% include "ui/field.html" with field=form.email %}
+        {% include "ui/field.html" with field=form.nid %}
+        <div class="sm:col-span-2">{% include "ui/field.html" with field=form.address %}</div>
+      </div>
+    </section>
+
+    <section class="rounded-card border border-line bg-surface p-5">
+      <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Connection</h2>
+
+      <div class="mt-4 grid gap-5 sm:grid-cols-2">
+        <div @change="conn = $event.target.value">
+          {% include "ui/field.html" with field=form.connection_type %}
+        </div>
+
+        {# PPPoE fields — server-side validation matches this toggle, because
+           a client-side toggle is a convenience, not a guarantee #}
+        <template x-if="conn === 'pppoe'">
+          <div>{% include "ui/field.html" with field=form.pppoe_username %}</div>
+        </template>
+        <template x-if="conn === 'pppoe'">
+          <div>{% include "ui/field.html" with field=form.pppoe_password %}</div>
+        </template>
+
+        <template x-if="conn === 'static_ip'">
+          <div>{% include "ui/field.html" with field=form.static_ip %}</div>
+        </template>
+        <template x-if="conn === 'static_ip'">
+          <div>{% include "ui/field.html" with field=form.mac_address %}</div>
+        </template>
+      </div>
+    </section>
+
+    <section class="rounded-card border border-line bg-surface p-5">
+      <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Service</h2>
+      <div class="mt-4 grid gap-5 sm:grid-cols-2">
+        {% include "ui/field.html" with field=form.router %}
+        {% include "ui/field.html" with field=form.package %}
+        {% include "ui/field.html" with field=form.pop %}
+        {% include "ui/field.html" with field=form.onu %}
+        {% include "ui/field.html" with field=form.grace_days %}
+        <div class="flex items-center gap-2 pt-6">
+          {{ form.auto_renew }}
+          <label for="{{ form.auto_renew.id_for_label }}" class="text-sm text-ink-2">
+            {{ form.auto_renew.label }}
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex gap-2">
+      <button type="submit"
+              class="rounded-card bg-brass px-4 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        {% if object %}Save changes{% else %}Create subscriber{% endif %}
+      </button>
+      <a href="{% if object %}{% url 'subscribers:detail' object.pk %}{% else %}{% url 'subscribers:list' %}{% endif %}"
+         class="rounded-card border border-line-2 px-4 py-2 text-sm text-ink-2 hover:bg-surface-2">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

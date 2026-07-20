@@ -1,51 +1,75 @@
-{% extends 'dashboard/baseDashboard.html' %}
-{% load crispy_forms_tags %}
-{% block title %}Dashboard{% endblock title %}
-{% block dashboard %}
-<div class="row p-5 mt-1">
-    <div class="col-lg-3 mx-3 my-3 shadow bg-primary p-3 rounded-2 text-white">
-        <h1>Business details</h1>
-        <li class="list-unstyled ms-1">earn: {{earn}}/= tk</li>
-        <li class="list-unstyled ms-1">invest: {{invest}}/= tk</li>
-        <li class="list-unstyled ms-1">profit: {{profit}}/= tk</li>
-        <li class="list-unstyled ms-1">loss: {{loss}}/= tk</li>
+{% extends "base.html" %}
 
-    </div>
+{% block title %}Dashboard{% endblock %}
+{% block header %}Dashboard{% endblock %}
 
-    <div class="col-lg-3 mx-3 my-3 shadow bg-secondary p-3 rounded-2 text-white">
-        <h1>Billing Details</h1>
-        <li class="list-unstyled ms-1">total_bill: {{total_bill}}</li>
-        <li class="list-unstyled ms-1">earn_via_bill: {{earn_via_bill}}</li>
-        <li class="list-unstyled ms-1">up_steam_bill: {{up_steam_bill}}</li>
-    </div>
+{% block content %}
+<div class="flex flex-col gap-6">
 
-    <div class="col-lg-3 mx-3 my-3 shadow bg-primary p-3 rounded-2 text-white">
-        <h1>Clients</h1>
-        <li class="list-unstyled ms-1">total clients: {{clients}}</li>
-        <li class="list-unstyled ms-1">active clients: {{active_clients}}</li>
-        <li class="list-unstyled ms-1">inactive clients: {{inactive_clients}}</li>
-    </div>
+  <div>
+    <h1 class="text-lg font-semibold">Network overview</h1>
+    <p class="mt-0.5 text-sm text-muted">
+      Live router health and session counts arrive in a later phase; these
+      figures come from the database.
+    </p>
+  </div>
 
-    <div class="col-lg-3 mx-3 my-3 shadow bg-success p-3 rounded-2 text-white">
-        <h1>Onu Details</h1>
-        <li class="list-unstyled ms-1">total onu: {{total_onu}}</li>
-        <li class="list-unstyled ms-1">active onu: {{active_onu}}</li>
-        <li class="list-unstyled ms-1">stored onu: {{stored_onu}}</li>
-        <li class="list-unstyled ms-1">damaged onu: {{damaged_onu}}</li>
+  {# ---- subscribers ---- #}
+  <section class="flex flex-col gap-2.5">
+    <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Subscribers</h2>
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+                bg-line sm:grid-cols-3">
+      {% include "ui/kpi.html" with key="Total" value=clients %}
+      {% include "ui/kpi.html" with key="Active" value=active_clients %}
+      {% include "ui/kpi.html" with key="Inactive" value=inactive_clients warn=inactive_clients %}
     </div>
+  </section>
 
-    <div class="col-lg-3 mx-3 my-3 shadow bg-info p-3 rounded-2 text-white">
-        <H1>Employ details</H1>
-        <li class="list-unstyled ms-1">total Employ: {{total_employ}}</li>
-        <li class="list-unstyled ms-1">active Employ: {{active_employ}}</li>
-        <li class="list-unstyled ms-1">stored Employ: {{inactive_employ}}</li>
+  {# ---- money ---- #}
+  <section class="flex flex-col gap-2.5">
+    <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Accounts</h2>
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+                bg-line sm:grid-cols-4">
+      {% include "ui/kpi.html" with key="Earnings" value=earn %}
+      {% include "ui/kpi.html" with key="Investment" value=invest %}
+      {% include "ui/kpi.html" with key="Profit" value=profit %}
+      {% include "ui/kpi.html" with key="Loss" value=loss alert=loss %}
     </div>
-    <div class="col-lg-3 mx-3 my-3 shadow bg-danger p-3 rounded-2 text-white">
-        <h1>Task Basket</h1>
-        <li class="list-unstyled ms-1">total basket: {{total_basket}}</li>
-        <li class="list-unstyled ms-1">pending basket: {{pending_basket}}</li>
-        <li class="list-unstyled ms-1">in progress basket: {{in_progress_basket}}</li>
-        <li class="list-unstyled ms-1">completed basket: {{completed_basket}}</li>
+  </section>
+
+  {# ---- field work ---- #}
+  <section class="flex flex-col gap-2.5">
+    <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Tasks</h2>
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+                bg-line sm:grid-cols-4">
+      {% include "ui/kpi.html" with key="Total" value=total_basket %}
+      {% include "ui/kpi.html" with key="Pending" value=pending_basket warn=pending_basket %}
+      {% include "ui/kpi.html" with key="In progress" value=in_progress_basket %}
+      {% include "ui/kpi.html" with key="Complete" value=completed_basket %}
     </div>
+  </section>
+
+  {# ---- equipment ---- #}
+  <section class="flex flex-col gap-2.5">
+    <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">ONU devices</h2>
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+                bg-line sm:grid-cols-4">
+      {% include "ui/kpi.html" with key="Total" value=total_onu %}
+      {% include "ui/kpi.html" with key="Active" value=active_onu %}
+      {% include "ui/kpi.html" with key="Stored" value=stored_onu %}
+      {% include "ui/kpi.html" with key="Damaged" value=damaged_onu alert=damaged_onu %}
+    </div>
+  </section>
+
+  {# ---- staff ---- #}
+  <section class="flex flex-col gap-2.5">
+    <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Staff</h2>
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+                bg-line sm:grid-cols-3">
+      {% include "ui/kpi.html" with key="Total" value=total_employ %}
+      {% include "ui/kpi.html" with key="Active" value=active_employ %}
+      {% include "ui/kpi.html" with key="Inactive" value=inactive_employ %}
+    </div>
+  </section>
 </div>
 {% endblock %}
