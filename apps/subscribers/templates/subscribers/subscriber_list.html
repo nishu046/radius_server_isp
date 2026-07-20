@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribers{% endblock %}
+{% block header %}Subscribers{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <h1 class="text-lg font-semibold">Subscribers</h1>
+    {% if perms.subscribers.add_subscriber %}
+      <a href="{% url 'subscribers:create' %}"
+         class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        Add subscriber
+      </a>
+    {% endif %}
+  </div>
+
+  {# summary before detail — the numbers that decide whether anyone acts today #}
+  <div class="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line
+              bg-line sm:grid-cols-4">
+    {% include "ui/kpi.html" with key="Active" value=counts.active %}
+    {% include "ui/kpi.html" with key="In grace" value=counts.grace warn=counts.grace detail="cut when grace ends" %}
+    {% include "ui/kpi.html" with key="Suspended" value=counts.suspended %}
+    {% include "ui/kpi.html" with key="Sync drift" value=counts.drifted alert=counts.drifted detail="needs review" %}
+  </div>
+
+  <form method="get" class="flex flex-wrap items-end gap-3 rounded-card border border-line
+                            bg-surface p-4">
+    <div class="min-w-56 flex-1">
+      {% include "ui/field.html" with field=filter.form.q %}
+    </div>
+    {% include "ui/field.html" with field=filter.form.service_state %}
+    {% include "ui/field.html" with field=filter.form.package %}
+    {% include "ui/field.html" with field=filter.form.router %}
+    <button type="submit"
+            class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">
+      Filter
+    </button>
+    {% if request.GET %}
+      <a href="{% url 'subscribers:list' %}" class="py-2 text-sm text-muted hover:text-ink">Clear</a>
+    {% endif %}
+  </form>
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[860px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            <th>Account</th>
+            <th>Name</th>
+            <th>Connection</th>
+            <th>Identifier</th>
+            <th>Package</th>
+            <th>Expires</th>
+            <th>State</th>
+            <th>Sync</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for subscriber in subscribers %}
+            <tr class="cursor-pointer hover:bg-surface-2"
+                onclick="window.location='{% url 'subscribers:detail' subscriber.pk %}'">
+              <td class="val text-ink-2">{{ subscriber.account_no }}</td>
+              <td>
+                <a href="{% url 'subscribers:detail' subscriber.pk %}"
+                   class="font-medium text-ink hover:text-brass">{{ subscriber.name }}</a>
+                <div class="val text-xs text-muted">{{ subscriber.phone }}</div>
+              </td>
+              <td class="text-ink-2">{{ subscriber.get_connection_type_display }}</td>
+              <td class="val text-ink-2">{{ subscriber.connection_identifier|default:"—" }}</td>
+              <td class="text-ink-2">{{ subscriber.package.name }}</td>
+              <td class="val text-ink-2" title="{{ subscriber.expires_at|default:'not set' }}">
+                {% if subscriber.expires_at %}
+                  {% if subscriber.days_until_expiry >= 0 %}
+                    in {{ subscriber.expires_at|timeuntil }}
+                  {% else %}
+                    {{ subscriber.expires_at|timesince }} ago
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">not set</span>
+                {% endif %}
+              </td>
+              <td>{% include "ui/pill.html" with state=subscriber.service_state %}</td>
+              <td>{% include "ui/pill.html" with state=subscriber.sync_state %}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="p-0">
+                {% if request.GET %}
+                  {% include "ui/empty.html" with title="No subscribers match those filters" description="Try clearing the search or widening the state filter." %}
+                {% else %}
+                  {% include "ui/empty.html" with title="No subscribers yet" description="A subscriber is a customer with a connection this system provisions and bills." action_url="/subscribers/create/" action_label="Add the first subscriber" %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}{% include "ui/pagination.html" %}{% endif %}
+</div>
+{% endblock %}

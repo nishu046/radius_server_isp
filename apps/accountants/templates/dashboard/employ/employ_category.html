@@ -1,39 +1,66 @@
-{% extends 'dashboard/baseDashboard.html' %}
-{% block title %}Employ_category Dashboard{% endblock title %}
-{% block dashboard %}
-<table class="table table-striped table-hover rounded-3">
+{% extends "base.html" %}
 
- <thead class="table-dark">
-  <tr>
-   <th colspan="4">
-    <a class='text-white' href={% url 'dashboard:employ_category-create' %}>Create</a>
-   </th>
-  </tr>
-  <tr>
-   <th scope="col">#</th>
-   <th scope="col">name</th>
-   <th scope="col">update</th>
-   <th scope="col">delete</th>
-  </tr>
- </thead>
- <tbody>
-  {% for employ_category in categories %}
-  <tr>
-   <th scope="row">{{forloop.counter}}</th>
-   <td>{{employ_category.name}}</td>
-   <td><a href={% url 'dashboard:employ_category-update' employ_category.id %}>update</a></td>
-   <td><a href={% url 'dashboard:employ_category-delete' employ_category.id %}>delete</a></td>
-  </tr>
-  {% endfor %}
+{% block title %}Employee categories{% endblock %}
+{% block header %}Employee categories{% endblock %}
 
- </tbody>
-</table>
+{% block content %}
+<div class="flex flex-col gap-5">
 
-{% if categories.has_previous %}
-<a class="btn prev-btn btn-success mb-3" href="?p={{categories.previous_page_number}}">previous</a>
-{% endif %}
-{{categories.number}}
-{% if categories.has_next %}
-<a class="btn next-btn btn-success mb-3" href="?p={{categories.next_page_number}}">next</a>
-{% endif %}
-{% endblock dashboard %}
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold">Employee categories</h1>
+      <p class="mt-0.5 text-sm text-muted">How staff roles are grouped.</p>
+    </div>
+    {% if perms.employ.add_employcategory %}
+      <a href="{% url 'dashboard:employ_category-create' %}"
+         class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        Add
+      </a>
+    {% endif %}
+  </div>
+
+  {% if filters %}
+    <form method="get" class="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface p-4">
+      {% for field in filters.form %}{% include "ui/field.html" with field=field %}{% endfor %}
+      <button type="submit"
+              class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">Filter</button>
+    </form>
+  {% endif %}
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[560px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            <th>Name</th><th class="text-right">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for category in categories %}
+            <tr class="hover:bg-surface-2">
+              <td class="font-medium text-ink">{{ category.name }}</td>
+              <td class="text-right whitespace-nowrap">
+                {% if perms.employ.change_employcategory %}
+                  <a href="{% url 'dashboard:employ_category-update' category.id %}" class="text-brass hover:underline">Edit</a>
+                {% endif %}
+                {% if perms.employ.delete_employcategory %}
+                  <a href="{% url 'dashboard:employ_category-delete' category.id %}" class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2" class="p-0">
+              {% include "ui/empty.html" with title="Nothing recorded yet" %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}{% include "ui/pagination.html" %}{% endif %}
+</div>
+{% endblock %}

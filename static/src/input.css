@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* Templates live outside this file's tree, so point the scanner at them. */
+@source "../../templates";
+@source "../../apps/**/templates";
+
+/* Theme toggle wins over the OS preference in both directions. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------
+   Design tokens
+
+   Tailwind colours resolve to CSS custom properties that flip per theme,
+   so every utility is theme-aware without a single dark: variant on a
+   colour. Components are styled through these names, never raw hex.
+
+   Rules that keep this coherent:
+     * brass is the ONLY accent — actions, focus, active nav
+     * state-* is for service state ONLY, never a button or heading
+     * status is never carried by colour alone; every pill has a label
+   --------------------------------------------------------------------- */
+
+@theme {
+  --color-canvas:    var(--c-canvas);
+  --color-surface:   var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+
+  --color-ink:       var(--c-ink);
+  --color-ink-2:     var(--c-ink-2);
+  --color-muted:     var(--c-muted);
+
+  --color-line:      var(--c-line);
+  --color-line-2:    var(--c-line-2);
+
+  --color-brass:     var(--c-brass);
+  --color-brass-bg:  var(--c-brass-bg);
+  --color-brass-ink: var(--c-brass-ink);
+
+  --color-state-active:    var(--c-active);
+  --color-state-active-bg: var(--c-active-bg);
+  --color-state-grace:     var(--c-grace);
+  --color-state-grace-bg:  var(--c-grace-bg);
+  --color-state-suspended: var(--c-suspended);
+  --color-state-suspended-bg: var(--c-suspended-bg);
+  --color-state-inactive:  var(--c-inactive);
+  --color-state-inactive-bg: var(--c-inactive-bg);
+
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+               "Liberation Mono", monospace;
+
+  --radius-card: 4px;
+}
+
+:root {
+  --c-canvas:     #F6F7F9;
+  --c-surface:    #FFFFFF;
+  --c-surface-2:  #EFF2F5;
+  --c-ink:        #10151C;
+  --c-ink-2:      #2C3742;
+  --c-muted:      #5C6773;
+  --c-line:       #DCE1E8;
+  --c-line-2:     #C3CBD5;
+  --c-brass:      #8A6A2F;
+  --c-brass-bg:   #F3EDE1;
+  --c-brass-ink:  #FFFFFF;
+  --c-active:     #047857;
+  --c-active-bg:  #E3F2EC;
+  --c-grace:      #B45309;
+  --c-grace-bg:   #FBEEDC;
+  --c-suspended:  #BE123C;
+  --c-suspended-bg: #FCE7EC;
+  --c-inactive:   #5C6773;
+  --c-inactive-bg: #E9EDF1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-canvas:     #0C1015;
+    --c-surface:    #131A22;
+    --c-surface-2:  #1A222C;
+    --c-ink:        #E6EBF0;
+    --c-ink-2:      #C3CDD8;
+    --c-muted:      #8B97A6;
+    --c-line:       #232D39;
+    --c-line-2:     #33404F;
+    --c-brass:      #C9A063;
+    --c-brass-bg:   #241E12;
+    --c-brass-ink:  #14100A;
+    --c-active:     #34D399;
+    --c-active-bg:  #0D2620;
+    --c-grace:      #FBBF24;
+    --c-grace-bg:   #2A1F0A;
+    --c-suspended:  #FB7185;
+    --c-suspended-bg: #2B111A;
+    --c-inactive:   #8B97A6;
+    --c-inactive-bg: #1C242E;
+  }
+}
+
+/* The toggle must beat the media query in BOTH directions. */
+:root[data-theme="dark"] {
+  --c-canvas:     #0C1015;
+  --c-surface:    #131A22;
+  --c-surface-2:  #1A222C;
+  --c-ink:        #E6EBF0;
+  --c-ink-2:      #C3CDD8;
+  --c-muted:      #8B97A6;
+  --c-line:       #232D39;
+  --c-line-2:     #33404F;
+  --c-brass:      #C9A063;
+  --c-brass-bg:   #241E12;
+  --c-brass-ink:  #14100A;
+  --c-active:     #34D399;
+  --c-active-bg:  #0D2620;
+  --c-grace:      #FBBF24;
+  --c-grace-bg:   #2A1F0A;
+  --c-suspended:  #FB7185;
+  --c-suspended-bg: #2B111A;
+  --c-inactive:   #8B97A6;
+  --c-inactive-bg: #1C242E;
+}
+
+:root[data-theme="light"] {
+  --c-canvas:     #F6F7F9;
+  --c-surface:    #FFFFFF;
+  --c-surface-2:  #EFF2F5;
+  --c-ink:        #10151C;
+  --c-ink-2:      #2C3742;
+  --c-muted:      #5C6773;
+  --c-line:       #DCE1E8;
+  --c-line-2:     #C3CBD5;
+  --c-brass:      #8A6A2F;
+  --c-brass-bg:   #F3EDE1;
+  --c-brass-ink:  #FFFFFF;
+  --c-active:     #047857;
+  --c-active-bg:  #E3F2EC;
+  --c-grace:      #B45309;
+  --c-grace-bg:   #FBEEDC;
+  --c-suspended:  #BE123C;
+  --c-suspended-bg: #FCE7EC;
+  --c-inactive:   #5C6773;
+  --c-inactive-bg: #E9EDF1;
+}
+
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    background-color: var(--c-canvas);
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--c-canvas);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Every network value — IPs, usernames, MACs, rate limits — is
+     monospace. Functional, not decorative: it says "copy this exactly"
+     and makes transposed digits visible. */
+  .val {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-brass);
+    outline-offset: 2px;
+  }
+
+  th, td { text-align: left; }
+}
+
+@layer utilities {
+  .tnum { font-variant-numeric: tabular-nums; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -14,14 +14,33 @@ Ordered by dependency. Each phase has its own note with tasks, code sketches, an
 
 | # | Phase | Status | Depends on |
 |---|-------|--------|------------|
-| 0 | [Foundation & security](phase-0-foundation.md) | Not started | — |
-| 1 | [Data model rework](phase-1-data-model.md) | Not started | P0 |
-| 2 | [Design system & Tailwind setup](phase-2-design-system.md) | Not started | P0 |
-| 3 | [Full UI redesign](phase-3-ui-redesign.md) | Not started | P1, P2 |
+| 0 | [Foundation & security](phase-0-foundation.md) | **Done** | — |
+| 1 | [Data model rework](phase-1-data-model.md) | **Done** | P0 |
+| 2 | [Design system & Tailwind setup](phase-2-design-system.md) | **Done** | P0 |
+| 3 | [Full UI redesign](phase-3-ui-redesign.md) | **Done** | P1, P2 |
 | 4 | [Router connectivity — read only](phase-4-router-readonly.md) | Not started | P1 |
 | 5 | [Provisioning — write path](phase-5-provisioning.md) | Not started | P4 |
 | 6 | [Billing & payments](phase-6-billing.md) | Not started | P1 |
 | 7 | [Automatic enforcement](phase-7-enforcement.md) | Not started | P5, P6 |
+
+### Deferred out of P0–P3
+
+Carried forward deliberately, not forgotten:
+
+- **PostgreSQL is configured but not running.** `DATABASE_URL` drives the DB
+  and `docker-compose.yml` is ready, but there is no Docker or Postgres on the
+  dev machine, so local dev is still SQLite. Switching is a one-line env change.
+  **P7 cannot ship on SQLite** — `select_for_update(skip_locked=True)` needs Postgres.
+- **Celery runs eagerly in dev** (`CELERY_EAGER=True`) because there is no Redis.
+  The beat heartbeat has not been observed running unattended for an hour, which
+  was P0's stated exit criterion.
+- **The migrated `Package` has a placeholder `upload_kbps`** equal to download,
+  because the old single `speed` integer could not tell us the upload rate. Every
+  migrated package needs a real upload value before P5 provisions from it.
+- **All migrated subscribers point at a disabled placeholder router**
+  (`UNASSIGNED-migrated`), since `Clients` had no router column. They must be
+  reassigned before P5.
+- **3 legacy client rows are unmigrated**, listed in `migration-unclassified.csv`.
 
 ### Why this order
 

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit {{ object.name }}{% else %}New package{% endif %}{% endblock %}
+{% block header %}{% if object %}Edit package{% else %}New package{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+  <form method="post" class="flex flex-col gap-6">
+    {% csrf_token %}
+
+    <div class="rounded-card border border-line bg-surface p-5">
+      {% include "ui/form.html" with form=form wide_fields="name" %}
+    </div>
+
+    {% if form.instance.pk and form.instance.subscribers.exists %}
+      <div class="rounded-card border border-state-grace bg-state-grace-bg px-4 py-3 text-sm text-state-grace">
+        {{ form.instance.subscribers.count }} subscriber(s) are on this package.
+        Changing the speed re-provisions all of them.
+      </div>
+    {% endif %}
+
+    <div class="flex gap-2">
+      <button type="submit"
+              class="rounded-card bg-brass px-4 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        {% if object %}Save changes{% else %}Create package{% endif %}
+      </button>
+      <a href="{% url 'billing:packages' %}"
+         class="rounded-card border border-line-2 px-4 py-2 text-sm text-ink-2 hover:bg-surface-2">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

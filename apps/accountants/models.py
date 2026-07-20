@@ -12,6 +12,9 @@ class CompanyProfile(models.Model):
   state = models.CharField(max_length=245)
   country = models.CharField(max_length=245)
 
+  class Meta:
+    ordering = ['name', 'id']
+
   def __str__(self):
     return self.name
 
@@ -20,6 +23,9 @@ class Owner(models.Model):
  user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='Owner')
  name = models.CharField(max_length=150)
  Commission = models.IntegerField()
+
+ class Meta:
+  ordering = ['name', 'id']
 
  def __str__(self):
   return self.name
@@ -35,6 +41,9 @@ class Invest(Wrapper):
  invest_details = models.CharField(max_length=500)
  invest_amount = models.IntegerField()
 
+ class Meta:
+  ordering = ['-created_at', '-id']
+
  def __str__(self):
   return self.invest_details
 
@@ -44,12 +53,18 @@ class Earning(Wrapper):
  earning_details = models.CharField(max_length=500)
  earning_amount = models.IntegerField()
 
+ class Meta:
+  ordering = ['-created_at', '-id']
+
  def __str__(self):
   return self.earning_details
 
 # Commission model
 class Commission(models.Model):
  profit = models.FloatField()
+
+ class Meta:
+  ordering = ['-id']
 
  def __str__(self):
   return str(self.profit)

@@ -1,0 +1,17 @@
+{% comment %}
+Dashboard stat tile.
+
+`alert` styles the value only when it is genuinely a problem — a zero in
+"routers down" is neutral, not red.
+
+    {% include "ui/kpi.html" with key="Online now" value=online detail="of 1431 active" %}
+    {% include "ui/kpi.html" with key="Routers down" value=down alert=down detail=down_names %}
+{% endcomment %}
+<div class="bg-surface px-4 py-3">
+  <div class="font-mono text-[10px] uppercase tracking-wider text-muted">{{ key }}</div>
+  <div class="mt-1.5 text-2xl leading-none font-semibold tnum
+              {% if alert %}text-state-suspended{% elif warn %}text-state-grace{% else %}text-ink{% endif %}">
+    {{ value }}
+  </div>
+  {% if detail %}<div class="mt-1.5 text-xs text-muted">{{ detail }}</div>{% endif %}
+</div>

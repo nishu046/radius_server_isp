@@ -1,0 +1,21 @@
+{% comment %}
+State pill. The label is always rendered — colour alone never carries
+meaning, so this works for colourblind users and on a phone in daylight.
+
+    {% include "ui/pill.html" with state=subscriber.service_state %}
+    {% include "ui/pill.html" with state="reachable" label="Up" %}
+{% endcomment %}
+<span class="inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5
+             font-mono text-[10px] font-medium uppercase tracking-wider whitespace-nowrap
+             {% if state == 'active' or state == 'reachable' or state == 'synced' or state == 'paid' %}
+               bg-state-active-bg text-state-active
+             {% elif state == 'grace' or state == 'pending' or state == 'dry_run' or state == 'partial' or state == 'drifted' %}
+               bg-state-grace-bg text-state-grace
+             {% elif state == 'suspended' or state == 'unreachable' or state == 'failed' or state == 'auth_failed' or state == 'unpaid' %}
+               bg-state-suspended-bg text-state-suspended
+             {% else %}
+               bg-state-inactive-bg text-state-inactive
+             {% endif %}">
+  <span class="size-1.5 rounded-full bg-current"></span>
+  {% if label %}{{ label }}{% else %}{{ state|title }}{% endif %}
+</span>

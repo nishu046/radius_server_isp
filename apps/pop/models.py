@@ -8,5 +8,8 @@ class Pop(models.Model):
  input_power = models.IntegerField(null=True, blank=True)
  total_user = models.IntegerField(null=True, blank=True)
 
+ class Meta:
+  ordering = ['name', 'id']
+
  def __str__(self):
   return self.name

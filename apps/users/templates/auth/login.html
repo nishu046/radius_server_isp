@@ -1,27 +1,56 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>log in</title>
-    <link rel="stylesheet" href="{% static 'login.css' %}">
-</head>
+{% block title %}Sign in{% endblock %}
 
-<body>
-    <div class="login-box">
-        <form class="login" method="post">
-            <h3>{{profile.name}}</h3>
-            {% csrf_token %}
-            <input name="email" type="text" placeholder="Email">
-            <input name="password" type="password" placeholder="Password">
-            {% if request.GET.next %}
-            <input type="hidden" name="next" value="{{request.GET.next}}">
-            {% endif %}
-            <button type="submit">Log in</button>
-        </form>
+{% block anonymous %}
+<div class="flex min-h-screen items-center justify-center bg-canvas px-4">
+  <div class="w-full max-w-sm">
+
+    <div class="mb-7 flex items-center gap-2.5">
+      <span class="size-2 rounded-full bg-brass"></span>
+      <span class="text-sm font-semibold">{{ company.name|default:"ISP Management" }}</span>
     </div>
-</body>
-</html>
+
+    <h1 class="text-xl font-semibold">Sign in</h1>
+    <p class="mt-1 text-sm text-muted">Use the email address your account was created with.</p>
+
+    {% if messages %}
+      <div class="mt-4 flex flex-col gap-2">
+        {% for message in messages %}
+          <div class="rounded-card border border-state-suspended bg-state-suspended-bg px-3.5 py-2.5
+                      text-sm text-state-suspended">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="mt-6 flex flex-col gap-4">
+      {% csrf_token %}
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
+
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-muted">Email</span>
+        <input type="email" name="email" required autofocus autocomplete="email"
+               class="w-full rounded-card border border-line bg-surface px-3 py-2 text-sm text-ink
+                      focus:border-brass focus:outline-none focus:ring-1 focus:ring-brass">
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-muted">Password</span>
+        <input type="password" name="password" required autocomplete="current-password"
+               class="w-full rounded-card border border-line bg-surface px-3 py-2 text-sm text-ink
+                      focus:border-brass focus:outline-none focus:ring-1 focus:ring-brass">
+      </label>
+
+      <button type="submit"
+              class="mt-1 rounded-card bg-brass px-4 py-2.5 text-sm font-medium text-brass-ink
+                     hover:opacity-90">
+        Sign in
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

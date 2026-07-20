@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks{% endblock %}
+{% block header %}Tasks{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold">Tasks</h1>
+      <p class="mt-0.5 text-sm text-muted">Installation and support jobs assigned to field staff.</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'tasks:tasks-category' %}"
+         class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">
+        Categories
+      </a>
+      {% if perms.tasks.add_tasks %}
+        <a href="{% url 'tasks:create' %}"
+           class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+          Add task
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if filters %}
+    <form method="get" class="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface p-4">
+      {% for field in filters.form %}{% include "ui/field.html" with field=field %}{% endfor %}
+      <button type="submit"
+              class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">Filter</button>
+    </form>
+  {% endif %}
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[760px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            <th>Token</th><th>Title</th><th>Category</th><th>Assigned to</th>
+            <th>Status</th><th>Approved</th><th>Created</th>
+            <th class="text-right">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for task in tasks %}
+            <tr class="hover:bg-surface-2">
+              <td class="val text-muted">#{{ task.task_token }}</td>
+              <td class="font-medium text-ink">{{ task.title }}</td>
+              <td class="text-ink-2">{{ task.task_category.name }}</td>
+              <td class="text-ink-2">{{ task.solver.name|default:"Unassigned" }}</td>
+              <td>
+                {% if task.status == 'complete' %}
+                  {% include "ui/pill.html" with state="active" label="Complete" %}
+                {% elif task.status == 'in progress' %}
+                  {% include "ui/pill.html" with state="grace" label="In progress" %}
+                {% else %}
+                  {% include "ui/pill.html" with state="inactive" label="Pending" %}
+                {% endif %}
+              </td>
+              <td>
+                {% if task.approved %}
+                  {% include "ui/pill.html" with state="active" label="Yes" %}
+                {% else %}
+                  {% include "ui/pill.html" with state="inactive" label="No" %}
+                {% endif %}
+              </td>
+              <td class="val text-muted">{{ task.created|date:"j M" }}</td>
+              <td class="text-right whitespace-nowrap">
+                {% if perms.tasks.change_tasks %}
+                  <a href="{% url 'tasks:update' task.id %}" class="text-brass hover:underline">Edit</a>
+                {% endif %}
+                {% if perms.tasks.delete_tasks %}
+                  <a href="{% url 'tasks:delete' task.id %}" class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="p-0">
+              {% include "ui/empty.html" with title="No tasks" description="Field jobs raised for installation, faults and support appear here." %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}{% include "ui/pagination.html" %}{% endif %}
+</div>
+{% endblock %}

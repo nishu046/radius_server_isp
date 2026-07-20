@@ -1,0 +1,18 @@
+{% comment %}
+Empty state with a real next action, not just "no data".
+
+    {% include "ui/empty.html" with title="No subscribers yet" action_url=... action_label="Add subscriber" %}
+{% endcomment %}
+<div class="flex flex-col items-center gap-3 px-6 py-14 text-center">
+  <p class="text-sm font-medium text-ink">{{ title|default:"Nothing here yet" }}</p>
+  {% if description %}
+    <p class="max-w-sm text-sm text-muted">{{ description }}</p>
+  {% endif %}
+  {% if action_url %}
+    <a href="{{ action_url }}"
+       class="mt-1 rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink
+              hover:opacity-90">
+      {{ action_label|default:"Create one" }}
+    </a>
+  {% endif %}
+</div>

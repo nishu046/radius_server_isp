@@ -1,14 +1,13 @@
-# imports
-from django.urls import include, path
+"""Legacy routes. apps.packages is superseded by apps.billing (P1)."""
 
-from . import views
+from django.urls import path
+from django.views.generic import RedirectView
 
 app_name = 'packages'
 
 urlpatterns = [
-    path('',views.PackagesView.as_view(), name='packages'),
-    path('create/',views.PackagesCreateView.as_view(), name='create'),
-    path('update/<str:pk>',views.PackagesUpdateView.as_view(), name='update'),
-    path('delete/<str:pk>',views.DeletePackages.as_view(), name='delete'),
-
+    path('', RedirectView.as_view(pattern_name='billing:packages', permanent=False),
+         name='packages'),
+    path('create/', RedirectView.as_view(pattern_name='billing:package-create', permanent=False),
+         name='create'),
 ]

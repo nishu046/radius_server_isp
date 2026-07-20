@@ -8,5 +8,8 @@ class Package(models.Model):
  speed = models.IntegerField()
  price = models.FloatField()
 
+ class Meta:
+  ordering = ['speed', 'name', 'id']
+
  def __str__(self):
   return self.name

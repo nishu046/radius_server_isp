@@ -8,6 +8,9 @@ from apps.employ.models import Employ
 class TaskCategory(models.Model):
  name = models.CharField(max_length=150)
 
+ class Meta:
+  ordering = ['name', 'id']
+
  def __str__(self):
   return self.name
 
@@ -27,6 +30,9 @@ class Tasks(models.Model):
  approved = models.BooleanField(default=False)
  created = models.DateTimeField(auto_now_add=True)
  updated = models.DateTimeField(auto_now=True)
+
+ class Meta:
+  ordering = ['-created', '-id']
 
  def __str__(self):
   return self.title

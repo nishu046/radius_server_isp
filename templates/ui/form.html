@@ -1,0 +1,22 @@
+{% comment %}
+A whole form as a loop over ui/field.html.
+
+    {% include "ui/form.html" with form=form %}
+{% endcomment %}
+{% if form.non_field_errors %}
+  <div class="rounded-card border border-state-suspended bg-state-suspended-bg px-4 py-3">
+    {% for error in form.non_field_errors %}
+      <p class="text-sm text-state-suspended">{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="grid gap-5 sm:grid-cols-2">
+  {% for field in form %}
+    {% if field.field.widget.input_type == 'checkbox' or field.name in wide_fields %}
+      <div class="sm:col-span-2">{% include "ui/field.html" with field=field %}</div>
+    {% else %}
+      {% include "ui/field.html" with field=field %}
+    {% endif %}
+  {% endfor %}
+</div>

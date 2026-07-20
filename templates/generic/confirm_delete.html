@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% comment %}
+Shared delete confirmation. Uses typed confirmation rather than an OK
+button — see templates/ui/confirm.html for why.
+{% endcomment %}
+
+{% block title %}Delete {{ object }}{% endblock %}
+{% block header %}Delete {{ page_title|default:"record" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  {% include "ui/confirm.html" with action_url=request.path cancel_url=cancel_url verb="Delete" phrase=object|stringformat:"s" title="Delete this record?" description="This cannot be undone." %}
+</div>
+{% endblock %}
