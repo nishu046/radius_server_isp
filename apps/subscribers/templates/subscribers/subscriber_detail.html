@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% load core_extras %}
+
+{% block title %}{{ subscriber.name }}{% endblock %}
+{% block header %}{{ subscriber.name }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-lg font-semibold">{{ subscriber.name }}</h1>
+        {% include "ui/pill.html" with state=subscriber.service_state %}
+      </div>
+      <p class="mt-1 val text-xs text-muted">
+        ACCT {{ subscriber.account_no }} · {{ subscriber.router.name }}
+        {% if subscriber.pop %} · {{ subscriber.pop.name }}{% endif %}
+        {% if subscriber.expires_at %}
+          · {% if subscriber.days_until_expiry >= 0 %}expires in {{ subscriber.expires_at|timeuntil }}
+            {% else %}expired {{ subscriber.expires_at|timesince }} ago{% endif %}
+        {% else %} · no expiry set{% endif %}
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      {% if perms.subscribers.change_subscriber %}
+        <a href="{% url 'subscribers:update' subscriber.pk %}"
+           class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">
+          Edit
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not subscriber.expires_at %}
+    <div class="rounded-card border border-state-grace bg-state-grace-bg px-4 py-3 text-sm text-state-grace">
+      No expiry date. This subscriber was migrated without billing history and
+      will not be suspended automatically until a payment sets one.
+    </div>
+  {% endif %}
+
+  <div class="grid gap-5 lg:grid-cols-3">
+
+    {# ---- connection & billing ---- #}
+    <div class="flex flex-col gap-5 lg:col-span-2">
+
+      <section class="rounded-card border border-line bg-surface p-5">
+        <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Connection</h2>
+        <dl class="mt-3 grid gap-4 sm:grid-cols-3">
+          <div>
+            <dt class="text-xs text-muted">Type</dt>
+            <dd class="mt-0.5 text-sm">{{ subscriber.get_connection_type_display }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">
+              {% if subscriber.connection_type == 'pppoe' %}Username{% else %}IP address{% endif %}
+            </dt>
+            <dd class="mt-0.5 val text-sm">{{ subscriber.connection_identifier|default:"—" }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Rate limit</dt>
+            <dd class="mt-0.5 val text-sm" title="RouterOS format: upload/download">
+              {{ subscriber.package.rate_limit }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Router</dt>
+            <dd class="mt-0.5 text-sm">{{ subscriber.router.name }}</dd>
+          </div>
+          {% if subscriber.mac_address %}
+          <div>
+            <dt class="text-xs text-muted">MAC</dt>
+            <dd class="mt-0.5 val text-sm">{{ subscriber.mac_address }}</dd>
+          </div>
+          {% endif %}
+          <div>
+            <dt class="text-xs text-muted">Router sync</dt>
+            <dd class="mt-1">{% include "ui/pill.html" with state=subscriber.sync_state %}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-card border border-line bg-surface p-5">
+        <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Service history</h2>
+
+        {% if events %}
+          <ol class="mt-3 flex flex-col">
+            {% for event in events %}
+              <li class="grid grid-cols-[auto_16px_1fr] items-start gap-3 py-2">
+                <span class="val w-28 pt-0.5 text-[11px] text-muted">
+                  {{ event.created_at|date:"j M H:i" }}
+                </span>
+                <span class="flex justify-center pt-1.5">
+                  <span class="size-1.5 rounded-full
+                    {% if event.state_after == 'active' %}bg-state-active
+                    {% elif event.state_after == 'grace' %}bg-state-grace
+                    {% elif event.state_after == 'suspended' or not event.succeeded %}bg-state-suspended
+                    {% else %}bg-line-2{% endif %}"></span>
+                </span>
+                <span class="text-[13px] text-ink-2">
+                  <b class="font-semibold text-ink">
+                    {% if event.state_after %}
+                      {{ event.state_before|title }} → {{ event.state_after|title }}
+                    {% else %}{{ event.action|title }}{% endif %}
+                  </b>
+                  {% if event.reason %} — {{ event.reason }}{% endif %}
+                  ·
+                  {% if event.is_automatic %}
+                    <span class="text-muted">automatic</span>
+                  {% else %}
+                    {{ event.actor.get_full_name|default:event.actor.email }}
+                  {% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          {% include "ui/empty.html" with title="No recorded events" description="State changes, payments and router operations appear here." %}
+        {% endif %}
+      </section>
+    </div>
+
+    {# ---- sidebar ---- #}
+    <div class="flex flex-col gap-5">
+
+      <section class="rounded-card border border-line bg-surface p-5">
+        <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Billing</h2>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div>
+            <dt class="text-xs text-muted">Package</dt>
+            <dd class="mt-0.5 text-sm">
+              {{ subscriber.package.name }}
+              <span class="text-muted">— ৳{{ subscriber.package.price|floatformat:0 }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Speed</dt>
+            <dd class="mt-0.5 val text-sm">
+              {{ subscriber.package.download_kbps|kbps }} down ·
+              {{ subscriber.package.upload_kbps|kbps }} up
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Cycle</dt>
+            <dd class="mt-0.5 val text-sm">{{ subscriber.package.billing_cycle_days }} days</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Grace period</dt>
+            <dd class="mt-0.5 val text-sm">{{ subscriber.grace_days }} days</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-card border border-line bg-surface p-5">
+        <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Contact</h2>
+        <dl class="mt-3 flex flex-col gap-3">
+          <div>
+            <dt class="text-xs text-muted">Phone</dt>
+            <dd class="mt-0.5 val text-sm">{{ subscriber.phone }}</dd>
+          </div>
+          {% if subscriber.email %}
+          <div>
+            <dt class="text-xs text-muted">Email</dt>
+            <dd class="mt-0.5 text-sm break-all">{{ subscriber.email }}</dd>
+          </div>
+          {% endif %}
+          <div>
+            <dt class="text-xs text-muted">Address</dt>
+            <dd class="mt-0.5 text-sm">{{ subscriber.address }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      {% if perms.subscribers.change_subscriber %}
+      <section class="rounded-card border border-line bg-surface p-5">
+        <h2 class="font-mono text-[10px] uppercase tracking-wider text-muted">Service state</h2>
+        <p class="mt-2 text-xs text-muted">
+          Manual override. Automatic changes come from billing.
+        </p>
+        <div class="mt-3 flex flex-col gap-2">
+          {% if subscriber.service_state != 'active' and subscriber.service_state != 'terminated' %}
+            <form method="post" action="{% url 'subscribers:change-state' subscriber.pk 'active' %}">
+              {% csrf_token %}
+              <input type="hidden" name="reason" value="manual restore">
+              <button class="w-full rounded-card border border-state-active px-3 py-2 text-sm
+                             font-medium text-state-active hover:bg-state-active-bg">
+                Restore service
+              </button>
+            </form>
+          {% endif %}
+
+          {% if subscriber.is_online_eligible %}
+            <a href="#suspend"
+               class="rounded-card border border-state-suspended px-3 py-2 text-center text-sm
+                      font-medium text-state-suspended hover:bg-state-suspended-bg">
+              Suspend
+            </a>
+          {% endif %}
+        </div>
+      </section>
+
+      {% if subscriber.is_online_eligible %}
+        {% url 'subscribers:change-state' subscriber.pk 'suspended' as suspend_url %}
+        {% url 'subscribers:detail' subscriber.pk as cancel_url %}
+        <div id="suspend">
+          {% include "ui/confirm.html" with action_url=suspend_url cancel_url=cancel_url verb="Suspend service" phrase=subscriber.account_no title="Suspend this subscriber?" description="Their PPPoE session is dropped immediately and they lose internet until service is restored." %}
+        </div>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

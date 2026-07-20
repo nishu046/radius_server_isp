@@ -1,8 +1,29 @@
+# environments
+/venv
 /isp-env
-/db.sqlite3
 /.env
+
+# database
+/db.sqlite3
+
+# collected static & generated css
+/staticfiles
+/static/dist
+
+# media uploads
+/media
+/Media
+
+# tooling
+/bin/tailwindcss
+/node_modules
+
+# migration reports (P1) — contain subscriber data
+/notes/migration-unclassified.csv
+
+# python
 *.log
 *.pot
 *.pyc
 __pycache__/
-/Media
+.pytest_cache/

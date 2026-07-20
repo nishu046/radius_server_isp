@@ -1,0 +1,23 @@
+{% comment %}Pagination for any ListView with paginate_by set.{% endcomment %}
+<nav class="flex items-center justify-between gap-3 text-sm" aria-label="Pagination">
+  <p class="text-muted">
+    Page <span class="tnum">{{ page_obj.number }}</span> of
+    <span class="tnum">{{ page_obj.paginator.num_pages }}</span>
+    <span class="text-muted">· {{ page_obj.paginator.count }} total</span>
+  </p>
+
+  <div class="flex gap-2">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}"
+         class="rounded-card border border-line-2 px-3 py-1.5 text-ink-2 hover:bg-surface-2">
+        Previous
+      </a>
+    {% endif %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}"
+         class="rounded-card border border-line-2 px-3 py-1.5 text-ink-2 hover:bg-surface-2">
+        Next
+      </a>
+    {% endif %}
+  </div>
+</nav>

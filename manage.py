@@ -7,6 +7,7 @@ import importlib
 
 def main():
     """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'isp_management.settings.dev')
     try:
         execute_from_command_line = importlib.import_module('django.core.management').execute_from_command_line
     except ImportError as exc:

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ object.name }}{% endblock %}
+{% block header %}Delete package{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  {% if object.subscribers.exists %}
+    <div class="rounded-card border border-state-suspended bg-surface p-5">
+      <h3 class="text-sm font-semibold text-ink">This package cannot be deleted</h3>
+      <p class="mt-1.5 text-sm text-muted">
+        {{ object.subscribers.count }} subscriber(s) are on “{{ object.name }}”.
+        Move them to another package first, or retire this one instead by
+        clearing its Active flag — retired packages stay assignable to
+        existing subscribers but cannot be chosen for new ones.
+      </p>
+      <div class="mt-4 flex gap-2">
+        <a href="{% url 'billing:package-update' object.pk %}"
+           class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink">
+          Retire instead
+        </a>
+        <a href="{% url 'billing:packages' %}"
+           class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2">Back</a>
+      </div>
+    </div>
+  {% else %}
+    {% include "ui/confirm.html" with action_url=request.path verb="Delete package" phrase=object.name title="Delete this package?" description="This cannot be undone. No subscribers are currently on it." cancel_url="/billing/packages/" %}
+  {% endif %}
+</div>
+{% endblock %}

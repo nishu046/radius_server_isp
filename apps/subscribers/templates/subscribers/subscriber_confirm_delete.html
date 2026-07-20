@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ object.name }}{% endblock %}
+{% block header %}Delete subscriber{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  {% url 'subscribers:detail' object.pk as cancel_url %}
+  {% include "ui/confirm.html" with action_url=request.path cancel_url=cancel_url verb="Delete subscriber" phrase=object.account_no title="Delete this subscriber?" description="Their service history is kept in the audit log, but the subscriber record and connection details are removed. Terminating instead preserves the record." %}
+</div>
+{% endblock %}

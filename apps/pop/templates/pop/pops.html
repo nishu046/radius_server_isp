@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}POPs{% endblock %}
+{% block header %}POPs{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold">Points of presence</h1>
+      <p class="mt-0.5 text-sm text-muted">Distribution points and the subscribers served from them.</p>
+    </div>
+    {% if perms.pop.add_pop %}
+      <a href="{% url 'pop:create' %}"
+         class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        Add POP
+      </a>
+    {% endif %}
+  </div>
+
+  {% if filters %}
+    <form method="get" class="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface p-4">
+      {% for field in filters.form %}{% include "ui/field.html" with field=field %}{% endfor %}
+      <button type="submit"
+              class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2 hover:bg-surface-2">Filter</button>
+    </form>
+  {% endif %}
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[600px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            <th>Name</th><th>Upstream POP</th><th>Input power</th><th>Subscribers</th>
+            <th class="text-right">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for pop in pops %}
+            <tr class="hover:bg-surface-2">
+              <td class="font-medium text-ink">{{ pop.name }}</td>
+              <td class="text-ink-2">{{ pop.main_pop.name|default:"—" }}</td>
+              <td class="val text-ink-2">{% if pop.input_power %}{{ pop.input_power }} dBm{% else %}—{% endif %}</td>
+              <td class="val text-ink-2">{{ pop.subscribers.count }}</td>
+              <td class="text-right whitespace-nowrap">
+                {% if perms.pop.change_pop %}
+                  <a href="{% url 'pop:update' pop.id %}" class="text-brass hover:underline">Edit</a>
+                {% endif %}
+                {% if perms.pop.delete_pop %}
+                  <a href="{% url 'pop:delete' pop.id %}" class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="p-0">
+              {% include "ui/empty.html" with title="No POPs yet" description="A POP groups the routers and subscribers served from one location." %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}{% include "ui/pagination.html" %}{% endif %}
+</div>
+{% endblock %}
