@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     # Custom applications
     'apps.users.apps.UsersConfig',
     'apps.network',
+    'apps.billing',
+    'apps.subscribers',
     'apps.employ',
     'apps.packages',
     'apps.onu',
