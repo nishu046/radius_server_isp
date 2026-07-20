@@ -21,7 +21,14 @@
 <section>
     <div class="profile">
         <div class="img_wrapper">
-            <img class=" shadow-1-strong mb-4" src="{{user_data.img.url}}" alt="avatar" style="width: 150px;" />
+            {% if user_data.img %}
+            <img class=" shadow-1-strong mb-4" src="{{ user_data.img.url }}" alt="avatar" style="width: 150px;" />
+            {% else %}
+            <div class="shadow-1-strong mb-4 d-flex align-items-center justify-content-center bg-secondary text-white"
+                 style="width: 150px; height: 150px; border-radius: 50%; font-size: 48px;">
+                {{ user_data.name|first|upper|default:"?" }}
+            </div>
+            {% endif %}
         </div>
         <div class="details">
             <h2 class="text-muted">{{user_data.name}}</h2>
