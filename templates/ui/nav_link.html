@@ -1,0 +1,16 @@
+{% comment %}
+Sidebar link, hidden when the user lacks the permission. Navigation
+reflects the role — a collector should not see routers or packages.
+
+    {% include "ui/nav_link.html" with url_name="pop:pops" label="POPs" perm="pop.view_pop" %}
+{% endcomment %}
+{% load core_extras %}
+{% if not perm or request.user|has_perm:perm %}
+  <a href="{% url url_name %}"
+     class="rounded-card px-2.5 py-1.5 text-ink-2 hover:bg-surface-2 hover:text-ink
+            {% if request.resolver_match.view_name == url_name %}
+              bg-brass-bg font-medium text-brass
+            {% endif %}">
+    {{ label }}
+  </a>
+{% endif %}

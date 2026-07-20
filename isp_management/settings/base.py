@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django_celery_beat',
     # Custom applications
+    'apps.core',
     'apps.users.apps.UsersConfig',
     'apps.network',
     'apps.billing',

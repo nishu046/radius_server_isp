@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load core_extras %}
+
+{% block title %}Packages{% endblock %}
+{% block header %}Packages{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-5">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold">Packages</h1>
+      <p class="mt-0.5 text-sm text-muted">
+        Speed and price for each plan. Changing a speed here updates every
+        subscriber on the plan.
+      </p>
+    </div>
+    {% if perms.billing.add_package %}
+      <a href="{% url 'billing:package-create' %}"
+         class="rounded-card bg-brass px-3.5 py-2 text-sm font-medium text-brass-ink hover:opacity-90">
+        Add package
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="overflow-hidden rounded-card border border-line bg-surface">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[720px] text-sm">
+        <thead>
+          <tr class="border-b border-line-2 bg-surface-2
+                     [&>th]:px-4 [&>th]:py-2.5 [&>th]:font-mono [&>th]:text-[10px]
+                     [&>th]:font-medium [&>th]:uppercase [&>th]:tracking-wider [&>th]:text-muted">
+            <th>Package</th>
+            <th>Download</th>
+            <th>Upload</th>
+            <th>Rate limit</th>
+            <th>Price</th>
+            <th>Cycle</th>
+            <th>Subscribers</th>
+            <th>Status</th>
+            <th class="text-right">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody class="[&>tr]:border-b [&>tr]:border-line [&>tr:last-child]:border-0
+                      [&_td]:px-4 [&_td]:py-2.5">
+          {% for package in packages %}
+            <tr class="hover:bg-surface-2">
+              <td class="font-medium text-ink">{{ package.name }}</td>
+              <td class="val text-ink-2">{{ package.download_kbps|kbps }}</td>
+              <td class="val text-ink-2">{{ package.upload_kbps|kbps }}</td>
+              <td class="val text-muted" title="RouterOS writes rate limits as upload/download">
+                {{ package.rate_limit }}
+              </td>
+              <td class="val text-ink-2">৳{{ package.price|floatformat:0 }}</td>
+              <td class="val text-ink-2">{{ package.billing_cycle_days }}d</td>
+              <td class="val text-ink-2">
+                {{ package.subscriber_count }}
+                {% if package.active_count %}
+                  <span class="text-muted">({{ package.active_count }} active)</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if package.is_active %}
+                  {% include "ui/pill.html" with state="active" label="Active" %}
+                {% else %}
+                  {% include "ui/pill.html" with state="inactive" label="Retired" %}
+                {% endif %}
+              </td>
+              <td class="text-right whitespace-nowrap">
+                {% if perms.billing.change_package %}
+                  <a href="{% url 'billing:package-update' package.pk %}"
+                     class="text-brass hover:underline">Edit</a>
+                {% endif %}
+                {% if perms.billing.delete_package %}
+                  <a href="{% url 'billing:package-delete' package.pk %}"
+                     class="ml-3 text-muted hover:text-state-suspended">Delete</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="p-0">
+                {% include "ui/empty.html" with title="No packages yet" description="A package defines the speed and price a subscriber is provisioned with." action_url="/billing/packages/create/" action_label="Add the first package" %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if is_paginated %}
+    {% include "ui/pagination.html" %}
+  {% endif %}
+</div>
+{% endblock %}

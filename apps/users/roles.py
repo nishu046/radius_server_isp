@@ -32,11 +32,19 @@ PERMISSIONS = {
         'accountants.view_earning', 'accountants.add_earning', 'accountants.change_earning',
         'accountants.view_companyprofile', 'accountants.change_companyprofile',
         'employ.view_employ', 'employ.add_employ', 'employ.change_employ',
-        'packages.view_package', 'packages.add_package', 'packages.change_package',
+        'billing.view_package', 'billing.add_package',
+        'billing.change_package', 'billing.delete_package',
+        'subscribers.view_subscriber', 'subscribers.add_subscriber',
+        'subscribers.change_subscriber', 'subscribers.delete_subscriber',
+        'network.view_router', 'network.add_router', 'network.change_router',
+        'network.view_serviceevent',
     ],
     ROLE_MANAGER: [
-        'clients.view_clients', 'clients.add_clients', 'clients.change_clients',
-        'packages.view_package',
+        'subscribers.view_subscriber', 'subscribers.add_subscriber',
+        'subscribers.change_subscriber',
+        'network.view_router',
+        'network.view_serviceevent',
+        'billing.view_package',
         'onu.view_onu', 'onu.add_onu', 'onu.change_onu',
         'pop.view_pop', 'pop.add_pop', 'pop.change_pop',
         'tasks.view_tasks', 'tasks.add_tasks', 'tasks.change_tasks',
@@ -44,12 +52,14 @@ PERMISSIONS = {
         'employ.view_employ',
     ],
     ROLE_COLLECTOR: [
-        # deliberately narrow: sees subscribers, records money, nothing else
-        'clients.view_clients',
-        'packages.view_package',
+        # deliberately narrow: sees subscribers, records money, nothing else.
+        # explicitly NOT change_subscriber — recording a payment and cutting
+        # off a customer are not the same trust level.
+        'subscribers.view_subscriber',
+        'billing.view_package',
     ],
     ROLE_TECHNICIAN: [
-        'clients.view_clients',
+        'subscribers.view_subscriber',
         'onu.view_onu', 'onu.change_onu',
         'pop.view_pop',
         'tasks.view_tasks', 'tasks.change_tasks',

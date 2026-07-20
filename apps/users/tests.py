@@ -75,7 +75,13 @@ class PermissionEnforcementTests(TestCase):
 
     def test_collector_keeps_granted_permission(self):
         """The narrowing must not remove what the role legitimately needs."""
-        self.assertTrue(self.collector.has_perm('clients.view_clients'))
+        self.assertTrue(self.collector.has_perm('subscribers.view_subscriber'))
+
+    def test_collector_cannot_change_subscribers(self):
+        """Recording a payment and cutting off a customer are not the same
+        trust level, so they are never the same permission."""
+        self.assertFalse(self.collector.has_perm('subscribers.change_subscriber'))
+        self.assertFalse(self.collector.has_perm('network.change_router'))
 
     def test_superuser_retains_access(self):
         admin = User.objects.create_superuser('root@example.com', 'pw-Str0ng!23')

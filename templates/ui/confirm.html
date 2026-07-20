@@ -1,0 +1,43 @@
+{% comment %}
+Typed confirmation for a destructive action.
+
+An OK button is too easy to click through when the consequence is a
+customer losing internet, so the operator must type the identifier.
+
+    {% include "ui/confirm.html" with
+        action_url=... verb="Suspend" phrase=subscriber.account_no
+        title="Suspend this subscriber?"
+        description="Their session is dropped immediately." %}
+{% endcomment %}
+<div x-data="{ typed: '' }"
+     class="rounded-card border border-state-suspended bg-surface p-5">
+  <h3 class="text-sm font-semibold text-ink">{{ title }}</h3>
+  {% if description %}
+    <p class="mt-1.5 text-sm text-muted">{{ description }}</p>
+  {% endif %}
+
+  <form method="post" action="{{ action_url }}" class="mt-4 flex flex-col gap-3">
+    {% csrf_token %}
+    <label class="flex flex-col gap-1.5">
+      <span class="font-mono text-[10px] uppercase tracking-wider text-muted">
+        Type <span class="text-ink">{{ phrase }}</span> to confirm
+      </span>
+      <input type="text" x-model="typed" autocomplete="off"
+             class="w-full max-w-xs rounded-card border border-line bg-surface px-3 py-2
+                    font-mono text-sm text-ink">
+    </label>
+
+    <div class="flex gap-2">
+      <button type="submit"
+              :disabled="typed !== '{{ phrase|escapejs }}'"
+              class="rounded-card border border-state-suspended px-3.5 py-2 text-sm font-medium
+                     text-state-suspended disabled:cursor-not-allowed disabled:opacity-40">
+        {{ verb }}
+      </button>
+      {% if cancel_url %}
+        <a href="{{ cancel_url }}"
+           class="rounded-card border border-line-2 px-3.5 py-2 text-sm text-ink-2">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
