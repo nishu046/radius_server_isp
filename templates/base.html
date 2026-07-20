@@ -47,9 +47,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'profile' %}">profile</a>
                     </li>
-                    {% if request.user %}
+                    {% if request.user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">log out</a>
+                        <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link">log out</button>
+                        </form>
                     </li>
                     {% endif %}
                 </ul>

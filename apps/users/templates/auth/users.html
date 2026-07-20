@@ -28,7 +28,13 @@
    <td>{{user.last_name}}</td>
    <td>{{user.email}}</td>
    <td><a href={% url 'user-update' user.id %}>update</a></td>
-   <td><a href={% url 'user-delete' user.id %}>delete</a></td>
+   <td>
+    {% if perms.users.delete_user and user != request.user %}
+    <form method="post" action="{% url 'user-delete' user.id %}">{% csrf_token %}
+     <button type="submit">delete</button>
+    </form>
+    {% endif %}
+   </td>
   </tr>
   {% endfor %}
 

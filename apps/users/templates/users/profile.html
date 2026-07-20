@@ -25,8 +25,9 @@
         </div>
         <div class="details">
             <h2 class="text-muted">{{user_data.name}}</h2>
-            {% if request.user.owner %} <h4 class="text-muted">Owner</h4> {% else %}<h4 class="text-muted"> Employ </h4>
-            {% endif %}
+            <h4 class="text-muted">
+                {% for group in request.user.groups.all %}{{ group.name|title }}{% if not forloop.last %}, {% endif %}{% empty %}No role{% endfor %}
+            </h4>
         </div>
     </div>
 
