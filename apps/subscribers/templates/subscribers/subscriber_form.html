@@ -37,8 +37,10 @@
           {% include "ui/field.html" with field=form.connection_type %}
         </div>
 
-        {# PPPoE fields — server-side validation matches this toggle, because
-           a client-side toggle is a convenience, not a guarantee #}
+        {% comment %}
+          PPPoE fields. Server-side validation matches this toggle, because a
+          client-side toggle is a convenience, not a guarantee.
+        {% endcomment %}
         <template x-if="conn === 'pppoe'">
           <div>{% include "ui/field.html" with field=form.pppoe_username %}</div>
         </template>

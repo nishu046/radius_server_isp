@@ -24,15 +24,29 @@
 <div x-data="{ nav: false }" class="flex min-h-screen">
 
   {# ---------------- sidebar ---------------- #}
-  <aside class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full border-r border-line
-                bg-surface transition-transform lg:static lg:translate-x-0"
+  {% comment %}
+    Mobile: a fixed off-canvas drawer. Desktop: sticky so it stays put while
+    the page scrolls — lg:static would put it in normal flow and scroll it away.
+
+    The mobile inset utilities are reset explicitly at lg because left-0 on a
+    *sticky* element sticks it horizontally too.
+
+    Use {% comment %}, not {#...#}, for anything multi-line: {#...#} is
+    single-line only, so a multi-line one renders as literal text and becomes
+    an anonymous flex item that destroys this layout.
+  {% endcomment %}
+  <aside class="fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 -translate-x-full flex-col
+                border-r border-line bg-surface transition-transform
+                lg:sticky lg:top-0 lg:right-auto lg:bottom-auto lg:left-auto
+                lg:h-screen lg:translate-x-0"
          :class="nav && 'translate-x-0'">
-    <div class="flex h-14 items-center gap-2.5 border-b border-line px-5">
+    <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-line px-5">
       <span class="size-2 rounded-full bg-brass"></span>
       <span class="truncate text-sm font-semibold">{{ company.name|default:"ISP Management" }}</span>
     </div>
 
-    <nav class="flex flex-col gap-0.5 p-3 text-sm">
+    {# only the nav scrolls, and only when it outgrows the viewport #}
+    <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3 text-sm">
       {% include "ui/nav_link.html" with url_name="dashboard:dashboard" label="Dashboard" %}
 
       <div class="mt-4 px-2 pb-1 font-mono text-[10px] uppercase tracking-wider text-muted">Service</div>
