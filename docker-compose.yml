@@ -1,0 +1,38 @@
+# Local infrastructure. The Django app itself still runs from the venv:
+#
+#   docker compose up -d
+#   DATABASE_URL=postgres://isp:isp@localhost:5432/isp \
+#   CELERY_EAGER=False ./venv/bin/python manage.py migrate
+#
+# Without this, the app falls back to SQLite and Celery runs eagerly, which
+# is fine for development but not what production looks like.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: isp
+      POSTGRES_PASSWORD: isp
+      POSTGRES_DB: isp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isp"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
