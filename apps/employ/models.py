@@ -11,6 +11,9 @@ User = get_user_model()
 class EmployCategory(models.Model):
  name = models.CharField(max_length=245)
 
+ class Meta:
+  ordering = ['name', 'id']
+
  def __str__(self):
   return self.name
 
@@ -31,6 +34,9 @@ class Employ(models.Model):
  type = models.ForeignKey(EmployCategory, on_delete=models.CASCADE)
  created = models.DateTimeField(auto_now_add=True)
  updated = models.DateTimeField(auto_now=True)
+
+ class Meta:
+  ordering = ['-created', '-id']
 
  def __str__(self):
   return self.name
